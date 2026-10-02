@@ -886,6 +886,91 @@ The course admin shall be able to cancel the use case at any time prior to submi
 
 **Assumptions:**
 **Open Issues:**
+### **UC-SEC-remind-non-submitters: The instructor sends submission reminders**
+
+**UC ID and Name:** UC-SEC-remind-non-submitters: Send submission reminders  
+**Created By:** Gustavo Castillo
+**Date Created:** October 2, 2026  
+**Primary Actor:** Instructor  
+**Secondary Actors:** Email service  
+**Trigger:** The instructor requests reminders asking students to submit a missing weekly activity report or peer evaluation.  
+**Description:** The instructor wants to remind students about their missing submissions so that they submit the weekly activity report or peer evaluation they have not completed.
+
+**Preconditions:**
+
+- PRE-1. The instructor is logged into the system.
+- PRE-2. The instructor is authorized to access the selected course section (BR-section-scoped-access).
+- PRE-3. The instructor has selected at least one student shown as missing a weekly activity report or peer evaluation for the selected week.
+
+**Postconditions:**
+
+- POST-1. The email service has accepted the qualifying submission reminders for sending.
+- POST-2. The system has recorded the successful sends to enforce BR-reminder-frequency.
+- POST-3. The instructor can see which reminders were sent, skipped, or failed.
+
+**Main Success Scenario:**
+  
+1. The instructor selects students shown as missing a weekly activity report or peer evaluation for the selected course section and week.
+2. The system checks which selected students are still missing those submissions and qualify for a reminder under the business rules.
+3. The system displays the qualifying students’ names, email addresses, and missing submissions.
+4. The instructor reviews the recipients and confirms sending the reminders.
+5. The system rechecks submission status and reminder eligibility after confirmation, immediately before sending. It skips submissions that no longer qualify and sends each remaining student an individual email identifying only their qualifying missing submissions and the relevant week.
+6. The system records the successful sends and shows the instructor which reminders were sent, skipped, or failed.
+7. Use case ends.
+
+**Extensions:**
+
+- **2a. The student has already submitted:**
+  - 2a1. The system skips the reminder for that submission and continues with the remaining selections.
+- **2b. The student is not assigned to a team in the selected section or has been deactivated:**
+  - 2b1. The system skips the student under BR-reminder-team-required.
+- **2c. The target week is inactive:**
+  - 2c1. The system skips the peer-evaluation reminder under BR-active-weeks.
+  - 2c2. A weekly activity report is not excluded solely because the week is inactive.
+- **2d. The student submitted and then deleted the submission:**
+  - 2d1. The system treats the submission as missing again.
+  - 2d2. The reminder remains subject to BR-reminder-frequency.
+- **2e. The submission window has closed:**
+  - 2e1. The system applies BR-reminder-after-close.
+  - 2e2. The email states that the submission is missing and the window is closed. It does not tell the student that late submission is available.
+- **2f. The reminder limit has been reached or today is not the configured due day:**
+  - 2f1. The system skips the reminder under BR-reminder-frequency.
+- **2g. No selected students qualify for reminders:**
+  - 2g1. The system displays “No reminders to send.”
+  - 2g2. Use case ends.
+- **4a. The instructor cancels:**
+  - 4a1. The system sends no reminders.
+  - 4a2. Use case ends.
+- **5a. The email service rejects a student's email:**
+  - 5a1. The system logs the failure and continues with the other recipients.
+  - 5a2. The system includes the failed send in the results shown to the instructor.
+  - **5b. A student's submission status or reminder eligibility changed after the preview:**
+  - 5b1. The system skips submissions that no longer qualify.
+  - 5b2. If no qualifying submissions remain for that student, the system sends no email to that student.
+  - 5b3. The system includes the skipped reminders in the results and continues with the remaining recipients.
+- **5c. Sending is interrupted:**
+  - 5c1. The system preserves known sending results and reports partial completion.
+  - 5c2. Any send whose outcome cannot be determined is marked as unknown and is not automatically retried.
+  
+**Priority:** High 
+
+**Frequency of Use:** On the configured due day.
+
+**Business Rules:** BR-section-scoped-access, BR-role-based-access, BR-team-assignment-required, BR-active-weeks, BR-evaluation-submission-window, BR-reminder-missing-artifact, BR-reminder-team-required, BR-reminder-frequency, BR-reminder-after-close, BR-student-lifecycle, BR-evaluation-editable-until-close
+
+**Associated Information:**
+
+- The target week means the week the work concerns, not the week the reminder is sent. It is displayed as a date range.
+- Viewing missing submissions is a separate use case from sending reminders. Scheduled reminders are also a separate use case.
+- Student submission information and sending results are visible only to authorized instructors and course admins under BR-section-scoped-access and BR-role-based-access, consistent with CO-ferpa.
+- Each email contains only the recipient's own missing-submission information.
+- Accepted emails cannot be rolled back. If sending is interrupted, the system preserves and reports successful, failed, skipped, and unknown outcomes.
+- The system blocks another attempt for an unknown sending outcome until that outcome is resolved.
+- Email acceptance does not guarantee delivery, reading, or subsequent submission.
+
+**Assumptions:** The separate missing-submissions viewing workflow supplies the selected course section, target week, and students.
+
+**Open Issues:** The viewing workflow must be specified before implementation. The process for resolving unknown email outcomes remains to be defined.
 
 ## **Team**
 
