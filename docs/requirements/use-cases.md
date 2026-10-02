@@ -886,6 +886,76 @@ The course admin shall be able to cancel the use case at any time prior to submi
 
 **Assumptions:**
 **Open Issues:**
+### **UC-SEC-remind-non-submitters: The instructor sends submission reminders**
+
+**UC ID and Name:** UC-SEC-remind-non-submitters: Send submission reminders  
+**Created By:** Gustavo Castillo
+**Date Created:** October 2, 2026  
+**Primary Actor:** Instructor  
+**Secondary Actors:** Email service  
+**Trigger:** The instructor requests reminders asking students to submit a missing weekly activity report or peer evaluation.  
+**Description:** The instructor wants to remind students about their missing submissions so that they submit the weekly activity report or peer evaluation they have not completed.
+
+**Preconditions:**
+
+- PRE-1. The instructor is logged into the system.
+- PRE-2. The instructor is authorized to access the selected course section (BR-section-scoped-access).
+- PRE-3. The instructor has selected at least one student shown as missing a weekly activity report or peer evaluation for the selected week.
+
+**Postconditions:**
+
+- POST-1. The email service has accepted the qualifying submission reminders for sending.
+- POST-2. The system has recorded the successful sends to enforce BR-reminder-frequency.
+- POST-3. The instructor can see which reminders were sent, skipped, or failed.
+
+**Main Success Scenario:**
+  
+1. The instructor selects students shown as missing a weekly activity report or peer evaluation for the selected course section and week.
+2. The system checks which selected students are still missing those submissions and qualify for a reminder under the business rules.
+3. The system displays the qualifying students’ names, email addresses, and missing submissions.
+4. The instructor reviews the recipients and confirms sending the reminders.
+5. The system sends each student an individual email identifying their missing submission and the relevant week.
+6. The system records the successful sends and shows the instructor which reminders were sent, skipped, or failed.
+7. Use case ends.
+
+**Extensions:**
+
+- **2a. The student has already submitted:**
+  - 2a1. The system skips the reminder for that submission and continues with the remaining selections.
+- **2b. The student is not assigned to a team:**
+  - 2b1. The system skips the student under BR-reminder-team-required.
+- **2c. The target week is inactive:**
+  - 2c1. The system skips the peer-evaluation reminder under BR-active-weeks.
+  - 2c2. A weekly activity report is not excluded solely because the week is inactive.
+- **2d. The student submitted and then deleted the submission:**
+  - 2d1. The system treats the submission as missing again.
+  - 2d2. The reminder remains subject to BR-reminder-frequency.
+- **2e. The submission window has closed:**
+  - 2e1. The system applies BR-reminder-after-close.
+  - 2e2. The email states that the submission is missing and the window is closed. It does not tell the student that late submission is available.
+- **2f. The reminder limit has been reached or today is not the configured due day:**
+  - 2f1. The system skips the reminder under BR-reminder-frequency.
+- **2g. No selected students qualify for reminders:**
+  - 2g1. The system displays “No reminders to send.”
+  - 2g2. Use case ends.
+- **4a. The instructor cancels:**
+  - 4a1. The system sends no reminders.
+  - 4a2. Use case ends.
+- **5a. The email service rejects a student's email:**
+  - 5a1. The system logs the failure and continues with the other recipients.
+  - 5a2. The system includes the failed send in the results shown to the instructor.
+  
+**Priority:** High 
+
+**Frequency of Use:** On the configured due day.
+
+**Business Rules:** BR-section-scoped-access, BR-role-based-access, BR-team-assignment-required, BR-active-weeks, BR-evaluation-submission-window, BR-reminder-missing-artifact, BR-reminder-team-required, BR-reminder-frequency, BR-reminder-after-close
+
+**Associated Information:**
+Viewing missing submissions is a separate use case from sending reminders. Scheduled reminders are also a separate use case.
+
+**Assumptions:**  
+**Open Issues:** How should a reminder about a closed peer-evaluation window explain that the student can no longer submit?
 
 ## **Team**
 
