@@ -914,7 +914,7 @@ The course admin shall be able to cancel the use case at any time prior to submi
 2. The system checks which selected students are still missing those submissions and qualify for a reminder under the business rules.
 3. The system displays the qualifying students’ names, email addresses, and missing submissions.
 4. The instructor reviews the recipients and confirms sending the reminders.
-5. The system sends each student an individual email identifying their missing submission and the relevant week.
+5. The system rechecks submission status and reminder eligibility after confirmation, immediately before sending. It skips submissions that no longer qualify and sends each remaining student an individual email identifying only their qualifying missing submissions and the relevant week.
 6. The system records the successful sends and shows the instructor which reminders were sent, skipped, or failed.
 7. Use case ends.
 
@@ -922,7 +922,7 @@ The course admin shall be able to cancel the use case at any time prior to submi
 
 - **2a. The student has already submitted:**
   - 2a1. The system skips the reminder for that submission and continues with the remaining selections.
-- **2b. The student is not assigned to a team:**
+- **2b. The student is not assigned to a team in the selected section or has been deactivated:**
   - 2b1. The system skips the student under BR-reminder-team-required.
 - **2c. The target week is inactive:**
   - 2c1. The system skips the peer-evaluation reminder under BR-active-weeks.
@@ -944,18 +944,33 @@ The course admin shall be able to cancel the use case at any time prior to submi
 - **5a. The email service rejects a student's email:**
   - 5a1. The system logs the failure and continues with the other recipients.
   - 5a2. The system includes the failed send in the results shown to the instructor.
+  - **5b. A student's submission status or reminder eligibility changed after the preview:**
+  - 5b1. The system skips submissions that no longer qualify.
+  - 5b2. If no qualifying submissions remain for that student, the system sends no email to that student.
+  - 5b3. The system includes the skipped reminders in the results and continues with the remaining recipients.
+- **5c. Sending is interrupted:**
+  - 5c1. The system preserves known sending results and reports partial completion.
+  - 5c2. Any send whose outcome cannot be determined is marked as unknown and is not automatically retried.
   
 **Priority:** High 
 
 **Frequency of Use:** On the configured due day.
 
-**Business Rules:** BR-section-scoped-access, BR-role-based-access, BR-team-assignment-required, BR-active-weeks, BR-evaluation-submission-window, BR-reminder-missing-artifact, BR-reminder-team-required, BR-reminder-frequency, BR-reminder-after-close
+**Business Rules:** BR-section-scoped-access, BR-role-based-access, BR-team-assignment-required, BR-active-weeks, BR-evaluation-submission-window, BR-reminder-missing-artifact, BR-reminder-team-required, BR-reminder-frequency, BR-reminder-after-close, BR-student-lifecycle, BR-evaluation-editable-until-close
 
 **Associated Information:**
-Viewing missing submissions is a separate use case from sending reminders. Scheduled reminders are also a separate use case.
 
-**Assumptions:**  
-**Open Issues:** How should a reminder about a closed peer-evaluation window explain that the student can no longer submit?
+- The target week means the week the work concerns, not the week the reminder is sent. It is displayed as a date range.
+- Viewing missing submissions is a separate use case from sending reminders. Scheduled reminders are also a separate use case.
+- Student submission information and sending results are visible only to authorized instructors and course admins under BR-section-scoped-access and BR-role-based-access, consistent with CO-ferpa.
+- Each email contains only the recipient's own missing-submission information.
+- Accepted emails cannot be rolled back. If sending is interrupted, the system preserves and reports successful, failed, skipped, and unknown outcomes.
+- The system blocks another attempt for an unknown sending outcome until that outcome is resolved.
+- Email acceptance does not guarantee delivery, reading, or subsequent submission.
+
+**Assumptions:** The separate missing-submissions viewing workflow supplies the selected course section, target week, and students.
+
+**Open Issues:** The viewing workflow must be specified before implementation. The process for resolving unknown email outcomes remains to be defined.
 
 ## **Team**
 
